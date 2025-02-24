@@ -35,6 +35,8 @@ import imgUrl from "./image.png";
 <img src={imgUrl} alt="Example image" />
 ```
 
+Otherwise, you propably **get an error about unknown file extension `.png`.**
+
 ## Installation
 
 This package is suitable for ESM only. In Node.js (version 18+), install with npm:
@@ -228,7 +230,7 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
 [badge-typescript]: https://img.shields.io/npm/types/recma-mdx-change-imports
 [url-typescript]: https://www.typescriptlang.org/
 
-[badge-codecov]: https://codecov.io/gh/ipikuka/recma-mdx-change-imports/graph/badge.svg?token=MPKUA07Z6N
+[badge-codecov]: https://codecov.io/gh/ipikuka/recma-mdx-change-imports/graph/badge.svg?token=utLdlh11PF
 [url-codecov]: https://codecov.io/gh/ipikuka/recma-mdx-change-imports
 
 [badge-type-coverage]: https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Frecma-mdx-change-imports%2Fmaster%2Fpackage.json
