@@ -1,6 +1,6 @@
 import { compile, nodeTypes } from "@mdx-js/mdx";
 import rehypeRaw from "rehype-raw";
-import { recmaImportImages } from "recma-import-images";
+import recmaMdxImportMedia from "recma-mdx-import-media";
 import rehypeMdxImportMedia from "rehype-mdx-import-media";
 import dedent from "dedent";
 
@@ -16,17 +16,17 @@ const source = dedent`
   ![alt](./image.png)
 `;
 
-describe("recmaMdxChangeImports, with support of recmaImportImages", () => {
+describe("recmaMdxChangeImports, with support of recmaMdxImportMedia", () => {
   // ******************************************
   it("when outputFormat is program, without baseUrl", async () => {
     const compiledSource = await compile(source, {
       outputFormat: "program",
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
-      recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+      recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
     });
 
     expect(String(compiledSource)).toContain(dedent`
-      const image_png$recmaImportImages = "/image.png";
+      const imagepng$recmamdximport = "/image.png";
     `);
 
     expect(String(compiledSource)).toContain(dedent`
@@ -40,12 +40,12 @@ describe("recmaMdxChangeImports, with support of recmaImportImages", () => {
       jsx: true,
       outputFormat: "program",
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
-      recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+      recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
     });
 
     // if jsx is true, recmaMdxChangeImports can not find the target
     expect(String(compiledSource)).not.toContain(dedent`
-      const image_png$recmaImportImages = "/image.png";
+      const imagepng$recmamdximport = "/image.png";
     `);
 
     expect(String(compiledSource)).toContain(dedent`
@@ -60,13 +60,13 @@ describe("recmaMdxChangeImports, with support of recmaImportImages", () => {
       baseUrl: import.meta.url,
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
       recmaPlugins: [
-        recmaImportImages,
+        recmaMdxImportMedia,
         [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
       ],
     });
 
     expect(String(compiledSource)).toContain(dedent`
-      const image_png$recmaImportImages = "/blog-images/image.png";
+      const imagepng$recmamdximport = "/blog-images/image.png";
     `);
 
     expect(String(compiledSource)).toContain(dedent`
@@ -79,11 +79,11 @@ describe("recmaMdxChangeImports, with support of recmaImportImages", () => {
     const compiledSource = await compile(source, {
       outputFormat: "function-body",
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
-      recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+      recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
     });
 
     expect(String(compiledSource)).toContain(dedent`
-      const image_png$recmaImportImages = "/image.png";
+      const imagepng$recmamdximport = "/image.png";
     `);
 
     expect(String(compiledSource)).toContain(dedent`
@@ -98,13 +98,13 @@ describe("recmaMdxChangeImports, with support of recmaImportImages", () => {
       baseUrl: import.meta.url,
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
       recmaPlugins: [
-        recmaImportImages,
+        recmaMdxImportMedia,
         [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
       ],
     });
 
     expect(String(compiledSource)).toContain(dedent`
-      const image_png$recmaImportImages = "/blog-images/image.png";
+      const imagepng$recmamdximport = "/blog-images/image.png";
     `);
 
     expect(String(compiledSource)).toContain(dedent`

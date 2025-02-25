@@ -204,6 +204,8 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
   – Recma plugin to change the `props` parameter into the `_props` in the `function _createMdxContent(props) {/* */}` in the compiled source in order to be able to use `{props.foo}` like expressions. It is useful for the `next-mdx-remote` or `next-mdx-remote-client` users in `nextjs` applications.
 - [`recma-mdx-change-imports`](https://www.npmjs.com/package/recma-mdx-change-imports)
   – Recma plugin to convert import declarations for assets and media with relative links into variable declarations with string URLs, enabling direct asset URL resolution in compiled MDX.
+- [`recma-mdx-import-media`](https://www.npmjs.com/package/recma-mdx-import-media)
+  – Recma plugin to turn media relative paths into import declarations for both markdown and html syntax in MDX.
 
 ## License
 

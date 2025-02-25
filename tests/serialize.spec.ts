@@ -1,6 +1,6 @@
 import dedent from "dedent";
 import { serialize } from "next-mdx-remote-client/serialize";
-import { recmaImportImages } from "recma-import-images";
+import recmaMdxImportMedia from "recma-mdx-import-media";
 
 import recmaMdxChangeImports, { type ChangeImportsOptions } from "../src";
 
@@ -91,14 +91,14 @@ describe("serialize", () => {
 
     // without any plugin
     expect(String(result1.compiledSource)).not.toContain(dedent`
-      import image_jpg$recmaImportImages from "./image.png";
+      import imagepng$recmamdximport from "./image.png";
     `);
 
     const result2 = await serialize({
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages],
+          recmaPlugins: [recmaMdxImportMedia],
           baseUrl: import.meta.url,
         },
       },
@@ -108,16 +108,16 @@ describe("serialize", () => {
       throw "Shouldn't be any syntax error !";
     }
 
-    // with only recmaImportImages
+    // with only recmaMdxImportMedia
     expect(String(result2.compiledSource)).toContain(dedent`
-      import image_png$recmaImportImages from "./image.png";
+      import imagepng$recmamdximport from "./image.png";
     `);
 
     const result3 = await serialize({
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+          recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
           baseUrl: import.meta.url,
         },
       },
@@ -129,7 +129,7 @@ describe("serialize", () => {
 
     // with plugin, no option
     expect(String(result3.compiledSource)).toContain(dedent`
-      const image_png$recmaImportImages = "/image.png";
+      const imagepng$recmamdximport = "/image.png";
     `);
 
     const result4 = await serialize({
@@ -137,7 +137,7 @@ describe("serialize", () => {
       options: {
         mdxOptions: {
           recmaPlugins: [
-            recmaImportImages,
+            recmaMdxImportMedia,
             [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
           ],
           baseUrl: import.meta.url,
@@ -151,7 +151,7 @@ describe("serialize", () => {
 
     // with plugin and option
     expect(String(result4.compiledSource)).toContain(dedent`
-      const image_png$recmaImportImages = "/blog-images/image.png";
+      const imagepng$recmamdximport = "/blog-images/image.png";
     `);
   });
 
@@ -165,7 +165,7 @@ describe("serialize", () => {
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages],
+          recmaPlugins: [recmaMdxImportMedia],
           baseUrl: import.meta.url,
         },
       },
@@ -175,17 +175,16 @@ describe("serialize", () => {
       throw "Shouldn't be any syntax error !";
     }
 
-    // with only recmaImportImages
-    // TODO: actually the plugin shouldn't catch the syntax because it is not relative
-    expect(String(result1.compiledSource)).toContain(dedent`
-      import image_png$recmaImportImages from "/image.png";
+    // with only recmaMdxImportMedia
+    expect(String(result1.compiledSource)).not.toContain(dedent`
+      import imagepng$recmamdximport from "/image.png";
     `);
 
     const result2 = await serialize({
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+          recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
           baseUrl: import.meta.url,
         },
       },
@@ -196,8 +195,8 @@ describe("serialize", () => {
     }
 
     // with plugins, recmaMdxChangeImports doesn't catch expectedly
-    expect(String(result2.compiledSource)).toContain(dedent`
-      import image_png$recmaImportImages from "/image.png";
+    expect(String(result2.compiledSource)).not.toContain(dedent`
+      const imagepng$recmamdximport = "/image.png";
     `);
 
     const result3 = await serialize({
@@ -228,7 +227,7 @@ describe("serialize", () => {
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages],
+          recmaPlugins: [recmaMdxImportMedia],
           baseUrl: import.meta.url,
         },
       },
@@ -238,16 +237,16 @@ describe("serialize", () => {
       throw "Shouldn't be any syntax error !";
     }
 
-    // with only recmaImportImages, it doesn't catch expectedly
+    // with only recmaMdxImportMedia, it doesn't catch expectedly
     expect(String(result1.compiledSource)).not.toContain(dedent`
-      import image_png$recmaImportImages from "https://www.google.com/image.png";
+      import imagepng$recmamdximport from "https://www.google.com/image.png";
     `);
 
     const result2 = await serialize({
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+          recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
           baseUrl: import.meta.url,
         },
       },
@@ -259,7 +258,7 @@ describe("serialize", () => {
 
     // with plugins, recmaMdxChangeImports doesn't catch expectedly
     expect(String(result2.compiledSource)).not.toContain(dedent`
-      const image_png$recmaImportImages = "https://www.google.com/image.png";
+      const imagepng$recmamdximport = "https://www.google.com/image.png";
     `);
 
     const result3 = await serialize({
@@ -300,7 +299,7 @@ describe("serialize", () => {
       source,
       options: {
         mdxOptions: {
-          recmaPlugins: [recmaImportImages, recmaMdxChangeImports],
+          recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
         },
       },
     });
@@ -313,7 +312,7 @@ describe("serialize", () => {
     expect(String(result.compiledSource)).not.toContain("const a");
     expect(String(result.compiledSource)).not.toContain("const b");
     expect(String(result.compiledSource)).not.toContain("const c");
-    expect(String(result.compiledSource)).not.toContain("const bar_jsx$recmaImportImages");
-    expect(String(result.compiledSource)).not.toContain("const image_png$recmaImportImages");
+    expect(String(result.compiledSource)).not.toContain("const barjsx$recmamdximport");
+    expect(String(result.compiledSource)).not.toContain("const imagepng$recmamdximport");
   });
 });
