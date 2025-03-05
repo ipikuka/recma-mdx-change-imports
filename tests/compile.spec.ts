@@ -39,7 +39,10 @@ describe("recmaMdxChangeImports, with support of recmaMdxImportMedia", () => {
       baseUrl: import.meta.url,
       recmaPlugins: [
         recmaMdxImportMedia,
-        [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
+        [
+          recmaMdxChangeImports,
+          { pathname: "blog-images", baseUrl: import.meta.url } as ChangeImportsOptions,
+        ],
       ],
     });
 
@@ -114,7 +117,10 @@ describe("recmaMdxChangeImports, with support of rehypeMdxImportMedia", () => {
       baseUrl: import.meta.url,
       rehypePlugins: [rehypeMdxImportMedia],
       recmaPlugins: [
-        [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
+        [
+          recmaMdxChangeImports,
+          { pathname: "blog-images", baseUrl: import.meta.url } as ChangeImportsOptions,
+        ],
       ],
     });
 

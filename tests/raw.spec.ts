@@ -61,7 +61,10 @@ describe("recmaMdxChangeImports, with support of recmaMdxImportMedia", () => {
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
       recmaPlugins: [
         recmaMdxImportMedia,
-        [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
+        [
+          recmaMdxChangeImports,
+          { pathname: "blog-images", baseUrl: import.meta.url } as ChangeImportsOptions,
+        ],
       ],
     });
 
@@ -139,9 +142,18 @@ describe("recmaMdxChangeImports, with support of rehypeMdxImportMedia", () => {
       baseUrl: import.meta.url,
       rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }], rehypeMdxImportMedia],
       recmaPlugins: [
-        [recmaMdxChangeImports, { pathname: "blog-images" } as ChangeImportsOptions],
+        [
+          recmaMdxChangeImports,
+          { pathname: "blog-images", baseUrl: import.meta.url } as ChangeImportsOptions,
+        ],
       ],
     });
+
+    // without recmaMdxChangeImports, for reference
+    /**
+     * import _rehypeMdxImportMedia0 from "file:///...../tests/image.png";
+     * import imgUrl from "file:///...../tests/image.png";
+     */
 
     expect(String(compiledSource)).toContain(dedent`
       const _rehypeMdxImportMedia0 = "/blog-images/image.png";
