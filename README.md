@@ -8,7 +8,7 @@
 [![typescript][badge-typescript]][url-typescript]
 [![license][badge-license]][url-license]
 
-This package is a **[unified][unified]** (**[recma][recma]**) plugin **that converts import declarations for assets and media with relative links into variable declarations with string URLs in the compiled MDX source.**
+This package is a **[unified][unified]** (**[recma][recma]**) plugin **that converts "import declarations for assets and media with relative links" into "variable declarations of string URLs" in the compiled MDX source.**
 
 **[unified][unified]** is a project that transforms content with abstract syntax trees (ASTs) using the new parser **[micromark][micromark]**. **[recma][recma]** adds support for producing a javascript code by transforming **[esast][esast]** which stands for Ecma Script Abstract Syntax Tree (AST) that is used in production of compiled source for the **[MDX][MDX]**.
 
@@ -16,7 +16,9 @@ This package is a **[unified][unified]** (**[recma][recma]**) plugin **that conv
 
 **Use this plugin to enable direct asset URL resolution in MDX documents.**
 
-This plugin allows you to transform asset and media imports with relative paths into string URLs, ensuring they resolve correctly in the compiled MDX output.
+This plugin allows you to transform asset and media imports with relative paths into string URLs, ensuring they resolve correctly in the compiled MDX output. 
+
+**It resolves the relative path of assets using the give option `pathname`.**
 
 For example, it transforms:
 
@@ -25,7 +27,19 @@ import imgUrl from "./image.png";
 ```
 into
 ```javascript
-const imgUrl = "/image.png";
+// if the option `pathname` is `data/articles`
+const imgUrl = "/data/articles/image.png";
+```
+
+or
+
+```javascript
+import imgUrl from "../blog-assets/image.png";
+```
+into
+```javascript
+// if the option `pathname` is `data/articles`
+const imgUrl = "/data/blog-assets/image.png";
 ```
 
 Using this plugin, you can write content in MDX like this:
@@ -35,7 +49,7 @@ import imgUrl from "./image.png";
 <img src={imgUrl} alt="Example image" />
 ```
 
-Otherwise, you propably **get an error about unknown file extension `.png`.**
+Otherwise, you probably **get an error about unknown file extension `.png`.**
 
 ## Installation
 
@@ -77,7 +91,7 @@ async function main() {
 
   const compiledSource = await compile(source, {
     outputFormat: "function-body",
-    recmaPlugins: [recmaMdxChangeImports],
+    recmaPlugins: [[recmaMdxChangeImports, {pathname: "data/articles"}]],
   });
 
   return String(compiledSource);
@@ -86,12 +100,13 @@ async function main() {
 
 Now, running `node example.js` produces the `compiled source` below:
 
-```js
+```diff
 "use strict";
 const {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];
 const _importMetaUrl = arguments[0].baseUrl;
 if (!_importMetaUrl) throw new Error("Unexpected missing \`options.baseUrl\` needed to support \`export … from\`, \`import\`, or \`import.meta.url\` when generating \`function-body\`");
-const imgUrl = "/image.png";
+- const {default: imgUrl} = await import(_resolveDynamicMdxSpecifier("./image.png"));
++ const imgUrl = "/data/articles/image.png";
 function _createMdxContent(props) {
   const _components = {
     h2: "h2",
@@ -129,27 +144,47 @@ function _resolveDynamicMdxSpecifier(d) {
 }
 ```
 
-Pay attention to that the compiled source contains the variable declatation **`const imgUrl = "/image.png";`**. Without the `recma-mdx-change-imports`, the statement would be an import declaration **`import imgUrl from "./image.png";`**.
-
 ## Options
 
-All options are optional and have default value.
+All options are optional and have no default value which is `undefined`.
 
 ```typescript
 export type ChangeImportsOptions = {
-  pathname?: string; // default is empty string ""
+  pathname?: string; // default is undefined
+  baseUrl?: string; // default is undefined
 };
 ```
 
-The options are self-explainotary, so that is why no need to represent more example here.
+### pathname
+
+It is a **`string`** option which is a **base path** for resolution of the **relative path**, finally to get **resolved path** for the asset.
+
+When it is not provided, only relative syntax `./`and `../` in the relative path is sliced and removed. So, you are suggested to provide a `pathname` always. Otherwise, the plugin can not know the current, parent, parent of parent directories and so on.
+
+If you have provided a pathname, but the resolved path exceeds the root, the same happen, meaningly the relative syntax `./`and `../` in the resolved path is sliced and removed.
 
 ```javascript
-use(recmaMdxChangeImports, {pathname: "blog-images"} as ChangeImportsOptions);
+use(recmaMdxChangeImports, {pathname: "data/articles"} as ChangeImportsOptions);
 ```
 
-now, the statement (variable declaration) in the compiled MDX source is going to be:
+Let's assume that we have the import statement `import imgUrl from "./image.png"` in MDX.
+
+With the option `pathname`, now the statement in the compiled MDX source is going to be:
 ```javascript
-const imgUrl = "/blog-images/image.png";
+// 
+const imgUrl = "/data/articles/image.png";
+```
+
+### baseUrl
+
+It is a **`string`** option which is for resolving absolute path (`file:///`) produced by compilation of MDX.
+
+`recma-mdx-change-imports` utilizes the `baseUrl` for getting relative path from the absolute path, if necessary.
+
+**`baseUrl`** should be the same with `baseUrl` in `@mdx-js/mdx`. You don't need to provide `baseUrl` sometimes, because the `compile` of `@mdx-js/mdx` may not produce absolute path according to the options provided. If you see that the image doesn't display and the `src` property consists something `../file:///..` then you need to provide the same `baseUrl` (mostly `import.meta.url`) to the plugin.
+
+```javascript
+use(recmaMdxChangeImports, {pathname: "data/articles", baseUrl: import.meta.url} as ChangeImportsOptions);
 ```
 
 ## Syntax tree
