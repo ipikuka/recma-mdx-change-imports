@@ -1,14 +1,91 @@
+import path from "path";
+import url from "url";
+
 import type { Plugin } from "unified";
 import type { Node, Program, VariableDeclaration } from "estree";
 import { CONTINUE, visit } from "estree-util-visit";
 
 export type ChangeImportsOptions = {
   pathname?: string;
+  baseUrl?: string;
 };
 
 const DEFAULT_SETTINGS: ChangeImportsOptions = {
-  pathname: "",
+  pathname: undefined,
+  baseUrl: undefined,
 };
+
+/**
+ * Checks if a file is a media asset (e.g., image, video, or audio file)
+ *
+ * @param {string} filename - The filename to check.
+ * @returns {boolean} - True if the file is a media asset.
+ */
+export function isMediaFile(filename: string): boolean {
+  return /\.(png|jpe?g|gif|webp|svg|mp4|webm|mp3|wav|ogg)$/i.test(filename);
+}
+
+/**
+ * it is reverse of function _resolveDynamicMdxSpecifier(d) in compiled source
+ */
+export function getRelativePath(absoluteUrl: string, baseUrl?: string): string {
+  if (!baseUrl) {
+    console.warn("Provide the baseUrl option for the plugin recma-mdx-change-imports");
+    return absoluteUrl;
+  }
+
+  const absolutePath = url.fileURLToPath(absoluteUrl);
+  let basePath = url.fileURLToPath(baseUrl);
+
+  // If baseUrl includes a file, get its directory
+  if (path.extname(basePath)) {
+    basePath = path.dirname(basePath);
+  }
+
+  let relativePath = path.relative(basePath, absolutePath);
+
+  // Ensure relative paths start with './' when needed
+  if (!relativePath.startsWith("..")) {
+    relativePath = `./${relativePath}`;
+  }
+
+  return relativePath;
+}
+
+/**
+ * Resolves a relative path based on an optional base pathname.
+ * @param relativePath - The relative or absolute path to resolve.
+ * @param pathname - The base pathname for resolution.
+ * @param baseUrl - The baseUrl which should be the same with baseUrl in the mdxOptions
+ * @returns The resolved path, always starting with "/".
+ */
+export function resolvePath(relativePath: string, pathname?: string, baseUrl?: string): string {
+  // remove leading/trailing slashes
+  const basePath = pathname ? pathname.replace(/^\/+|\/+$/g, "") : "";
+
+  // Normalize the relativePath ensuring the string is in a valid Unicode form
+  // for example e\u0301 to é franch letter
+  relativePath = relativePath.normalize("NFC");
+
+  if (relativePath.startsWith("file:///")) {
+    relativePath = getRelativePath(relativePath, baseUrl);
+  }
+
+  // If no pathname is provided, remove "./" and "../", and return
+  if (!basePath) {
+    return `/${relativePath.replace(/^(\.\/|(\.\.\/)+)/, "")}`;
+  }
+
+  // Normalize path to handle system-specific slashes and relative syntax (./ ../)
+  const normalizedPath = path.normalize(`${basePath}/${relativePath}`);
+
+  // If still exceeds root after path.normalize(), remove "./" and "../", and return
+  if (normalizedPath.startsWith("..")) {
+    return `/${normalizedPath.replace(/^(\.\/|(\.\.\/)+)/, "")}`;
+  }
+
+  return `/${normalizedPath}`;
+}
 
 /**
  * It is a recma plugin which transforms the esAST / esTree.
@@ -18,7 +95,6 @@ const DEFAULT_SETTINGS: ChangeImportsOptions = {
  * The "recma-mdx-change-imports" basically converts:
  * from `import image from "./image.png";`
  *
- * (If the option "pathname" is default value or is not defined)
  * into `const image = "/image.png";`
  *
  * (If the option "pathname" is "blog-images")
@@ -73,7 +149,7 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
         return CONTINUE;
       }
 
-      // Ensure the import statement is for a relative
+      // Ensure the import statement is for a relative path or absolute path
       if (
         !value.startsWith("./") &&
         !value.startsWith("../") &&
@@ -87,11 +163,9 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
         return CONTINUE;
       }
 
-      // remove "./" and "../"
-      const path = value.replace(/^\.\.\//, "").replace(/^\.\//, "");
-      const url = settings.pathname ? `/${settings.pathname}/${path}` : `/${path}`;
+      const url = resolvePath(value, settings.pathname, settings.baseUrl);
 
-      // Replace the import statement with a variable declaration
+      // Replace the variable declaration with a new one
       const newDeclaration: VariableDeclaration = {
         type: "VariableDeclaration",
         kind: "const",
@@ -113,7 +187,7 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
       return CONTINUE;
     });
 
-    // visit import declaratrions
+    // visit import declarations
     visit(tree, (node, _, index, ancestors) => {
       if (node.type !== "ImportDeclaration") return CONTINUE;
 
@@ -136,7 +210,7 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
         return CONTINUE;
       }
 
-      // Ensure the import statement is for a relative
+      // Ensure the import statement is for a relative or absolute path
       if (
         !value.startsWith("./") &&
         !value.startsWith("../") &&
@@ -147,20 +221,10 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
 
       // ensure the path refers to a media file
       if (!isMediaFile(value)) {
-        /* istanbul ignore next */
         return CONTINUE;
       }
 
-      // TODO-1: consider import.meta.url to resolve the relative path
-      // console.log(import.meta.url);
-
-      const path = value.startsWith("file:")
-        ? // get last file name with extension // TODO-1
-          value.replace(/^.*\//, "")
-        : // remove "./" and "../"
-          value.replace(/^(?:\.+\/)+/, "");
-
-      const url = `/${settings.pathname ? settings.pathname + "/" : ""}${path}`;
+      const url = resolvePath(value, settings.pathname, settings.baseUrl);
 
       // Replace the import statement with a variable declaration
       const newDeclaration: VariableDeclaration = {
@@ -185,15 +249,5 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
     });
   };
 };
-
-/**
- * Checks if a file is a media asset (e.g., image, video, or audio file)
- *
- * @param {string} filename - The filename to check.
- * @returns {boolean} - True if the file is a media asset.
- */
-function isMediaFile(filename: string): boolean {
-  return /\.(png|jpe?g|gif|webp|svg|mp4|webm|mp3|wav|ogg)$/i.test(filename);
-}
 
 export default plugin;
