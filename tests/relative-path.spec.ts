@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 
-import { getRelativePath } from "../src";
+import { getRelativePath } from "../src/utils.js";
 
 describe("getRelativePath", () => {
   it("should return the correct relative path for same directory", () => {

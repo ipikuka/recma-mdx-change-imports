@@ -1,4 +1,4 @@
-import { resolvePath } from "../src";
+import { resolvePath } from "../src/utils.js";
 
 describe("resolve path", () => {
   it("should normalize pathname by removing leading and trailing slashes", () => {
