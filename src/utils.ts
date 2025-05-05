@@ -8,7 +8,7 @@ import url from "url";
  * @returns {boolean} - True if the file is a media asset.
  */
 export function isMediaFile(filename: string): boolean {
-  return /\.(png|jpe?g|gif|webp|svg|mp4|webm|mp3|wav|ogg)$/i.test(filename);
+  return /\.(png|jpe?g|gif|avif|webp|svg|mp4|mov|webm|mp3|wav|ogg)$/i.test(filename);
 }
 
 /**
