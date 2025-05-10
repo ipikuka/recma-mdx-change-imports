@@ -51,6 +51,9 @@ import imgUrl from "./image.png";
 
 Otherwise, you probably **get an error about unknown file extension `.png`.**
 
+> [!WARNING]  
+> **`@next/mdx`** users may not need to use **`recma-mdx-change-props`** since built-in bundler system in `nextjs` can resolve the assets properly.
+
 ## Installation
 
 This package is suitable for ESM only. In Node.js (version 18+), install with npm:
