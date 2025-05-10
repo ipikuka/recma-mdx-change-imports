@@ -35,7 +35,7 @@ describe("recmaMdxChangeImports, with support of recmaMdxImportMedia", () => {
   });
 
   // ******************************************
-  it("when jsx is true, recmaMdxChangeImports can't find the target", async () => {
+  it("when jsx is true, recmaMdxChangeImports can find the target", async () => {
     const compiledSource = await compile(source, {
       jsx: true,
       outputFormat: "program",
@@ -43,8 +43,7 @@ describe("recmaMdxChangeImports, with support of recmaMdxImportMedia", () => {
       recmaPlugins: [recmaMdxImportMedia, recmaMdxChangeImports],
     });
 
-    // if jsx is true, recmaMdxChangeImports can not find the target
-    expect(String(compiledSource)).not.toContain(dedent`
+    expect(String(compiledSource)).toContain(dedent`
       const imagepng$recmamdximport = "/image.png";
     `);
 
