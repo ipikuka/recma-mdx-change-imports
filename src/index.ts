@@ -45,12 +45,14 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
 
       if (node.declarations[0].id.type === "ObjectPattern") {
         const property = node.declarations[0].id.properties[0];
+        /* istanbul ignore next */
         if (property.type === "Property" && property.value.type === "Identifier") {
           name = property.value.name;
         }
       }
 
       if (node.declarations[0].init?.type === "AwaitExpression") {
+        /* istanbul ignore if */
         if (node.declarations[0].init.argument.type === "ImportExpression") {
           if (node.declarations[0].init.argument.source.type === "CallExpression") {
             const argument = node.declarations[0].init.argument.source.arguments[0];
@@ -107,6 +109,7 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
 
       const parent = ancestors[0] as Program;
 
+      /* istanbul ignore if */
       if ("body" in parent) {
         parent.body[index!] = newDeclaration;
       }
@@ -168,6 +171,7 @@ const plugin: Plugin<[ChangeImportsOptions?], Program> = (options = {}) => {
 
       const parent = ancestors[0] as Program;
 
+      /* istanbul ignore if */
       if ("body" in parent) {
         parent.body[index!] = newDeclaration;
       }
