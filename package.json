@@ -1,6 +1,6 @@
 {
   "name": "recma-mdx-change-imports",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "It is a recma plugin which converts import declarations for assets and media with relative links into variable declarations with string URLs in the compiled MDX source",
   "type": "module",
   "exports": "./dist/esm/index.js",
