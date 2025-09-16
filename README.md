@@ -14,7 +14,7 @@ This package is a **[unified][unified]** (**[recma][recma]**) plugin **that conv
 
 ## When should I use this?
 
-**Use this plugin to enable direct asset URL resolution in MDX documents.**
+Use **`recma-mdx-change-imports`** to **enable direct asset URL resolution in MDX documents.**
 
 **`recma-mdx-change-imports`** transforms relative paths into string URLs for asset/media imports, ensuring they are correctly resolved in the compiled MDX output.
 
@@ -181,7 +181,7 @@ const imgUrl = "/data/articles/image.png";
 
 It is a **`string`** option which is for resolving absolute path (`file:///`) produced by compilation of MDX.
 
-`recma-mdx-change-imports` utilizes the `baseUrl` for deriving *relative path* from the *absolute path*, if necessary.
+**`recma-mdx-change-imports`** utilizes the `baseUrl` for deriving *relative path* from the *absolute path*, if necessary.
 
 **`baseUrl`** should be the same with `baseUrl` in `@mdx-js/mdx`. In some cases, you may not need to provide a `baseUrl`, because the `compile` of `@mdx-js/mdx` may not produce *absolute path* according to the options provided. If you see the image doesn't display and the `src` property consists something `../file:///..` then you need to provide the same `baseUrl` (mostly `import.meta.url`) to the plugin.
 
@@ -203,7 +203,7 @@ This plugin works with `unified` version 6+. It is compatible with `mdx` version
 
 ## Security
 
-Use of `recma-mdx-change-imports` does not involve user content so there are no openings for cross-site scripting (XSS) attacks.
+Use of **`recma-mdx-change-imports`** does not involve user content so there are no openings for cross-site scripting (XSS) attacks.
 
 ## My Plugins
 
