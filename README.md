@@ -191,7 +191,7 @@ It is a **`string`** option which is for resolving absolute path (`file:///`) pr
 
 **`recma-mdx-change-imports`** utilizes the `baseUrl` for deriving *relative path* from the *absolute path*, if necessary.
 
-**`baseUrl`** should be the same with `baseUrl` in `@mdx-js/mdx`. In some cases, you may not need to provide a `baseUrl`, because the `compile` of `@mdx-js/mdx` may not produce *absolute path* according to the options provided. If you see the image doesn't display and the `src` property consists something `../file:///..` then you need to provide the same `baseUrl` (mostly `import.meta.url`) to the plugin.
+**`baseUrl`** should be the same with `baseUrl` in **`@mdx-js/mdx`**. In some cases, you may not need to provide a `baseUrl`, because the `compile` of `@mdx-js/mdx` may not produce *absolute path* according to the options provided. If you see the image doesn't display and the `src` property consists something `../file:///..` then you need to provide the same `baseUrl` (mostly `import.meta.url`) to the plugin.
 
 ```javascript
 use(recmaMdxChangeImports, {pathname: "data/articles", baseUrl: import.meta.url} as ChangeImportsOptions);
