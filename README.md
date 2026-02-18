@@ -3,7 +3,7 @@
 
 ### [Become a sponsor](https://github.com/sponsors/ipikuka) 🚀
 
-If you find **`remark-mdx-change-imports`** useful in your projects, consider supporting my work.  
+If you find **`recma-mdx-change-imports`** useful in your projects, consider supporting my work.  
 Your sponsorship means a lot 💖
 
 My sponsors are going to be featured here and on [my sponsor wall](https://github.com/sponsors/ipikuka).
