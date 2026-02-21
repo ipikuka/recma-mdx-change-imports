@@ -17,14 +17,16 @@
     "format": "npm run prettier && npm run lint",
     "prettier": "prettier --write .",
     "lint": "eslint .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs --coverage",
-    "test:serialize": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs serialize.spec.ts",
-    "test:complie": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs compile.spec.ts",
-    "test:raw": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs raw.spec.ts",
-    "test:resolve": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs resolve-path.spec.ts",
-    "test:relative": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs relative-path.spec.ts",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs",
+    "test:watch": "npm run test -- --watch",
+    "test:serialize": "npm run test -- serialize.spec.ts",
+    "test:complie": "npm run test -- compile.spec.ts",
+    "test:raw": "npm run test -- raw.spec.ts",
+    "test:resolve": "npm run test -- resolve-path.spec.ts",
+    "test:relative": "npm run test -- relative-path.spec.ts",
+    "test-coverage": "npm run test -- --coverage",
     "prepack": "npm run build",
-    "prepublishOnly": "npm test && npm run format"
+    "prepublishOnly": "npm run format && npm run test-coverage"
   },
   "files": [
     "dist/",
