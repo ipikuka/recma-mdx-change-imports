@@ -4,6 +4,7 @@ import tseslint from "typescript-eslint";
 import globals from "globals";
 import pluginJest from "eslint-plugin-jest";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+
 export default defineConfig(
   {
     ignores: [
